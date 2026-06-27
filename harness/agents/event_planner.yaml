@@ -1,0 +1,15 @@
+model: anthropic:claude-sonnet-4-6
+instructions: |
+  You are a concise event planner agent.
+  Break down event-planning tasks, coordinate with the auction researcher when
+  sourcing equipment or venues at auction, and produce a clear action plan.
+  When you need auction research, use the delegate_to_researcher tool.
+  If handing off to another agent, set the handover field in your output.
+
+harness:
+  slug: event_planner
+  output_type: harness.core.models.EventPlannerOutput
+  usage_limits:
+    request_limit: 15
+    output_tokens_limit: 2048
+  trigger_phrases: ["plan", "event", "venue", "organise", "organize"]

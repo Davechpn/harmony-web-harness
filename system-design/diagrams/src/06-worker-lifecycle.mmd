@@ -1,0 +1,28 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, system-ui, sans-serif','primaryColor':'#EDE7FF','primaryBorderColor':'#8B6FE8','primaryTextColor':'#2A2350','lineColor':'#8E7BD6','secondaryColor':'#E4DCFB','tertiaryColor':'#F5F1FF','clusterBkg':'#F6F2FF','clusterBorder':'#C9BCF2','titleColor':'#3A2F6B','actorBkg':'#E7DEFF','actorBorder':'#7C5CD6','actorTextColor':'#2A2350','actorLineColor':'#B6A6EC','signalColor':'#6E5AC2','signalTextColor':'#3A3160','labelBoxBkgColor':'#EDE7FF','labelBoxBorderColor':'#8B6FE8','labelTextColor':'#2A2350','loopTextColor':'#5A4BA0','noteBkgColor':'#FBF1DA','noteBorderColor':'#E3C98B','noteTextColor':'#4A3F2A','activationBkgColor':'#D9CCFA','activationBorderColor':'#9A82E0'},'flowchart':{'useMaxWidth':false,'htmlLabels':true,'curve':'basis'},'sequence':{'useMaxWidth':false}}}%%
+sequenceDiagram
+    participant Q as Queue (Redis)
+    participant WK as Worker
+    participant PE as Policy engine
+    participant ST as State store
+    participant MD as Model (via gateway)
+    participant TL as Tools
+    participant CK as Checkpoints/Trace
+
+    Q->>WK: dequeue run job (tenant, agent, thread, trigger)
+    WK->>PE: load config · check budget + kill flag
+    WK->>ST: inject history + memory + credentials
+    loop agent loop (bounded by UsageLimits)
+        WK->>WK: check kill flag (step boundary)
+        WK->>MD: call model
+        MD-->>WK: response (text / tool calls)
+        WK->>PE: pre-tool policy check
+        alt gated tool (HITL)
+            WK->>CK: park run + push approval card to chat
+        else allowed
+            WK->>TL: execute tool
+            TL-->>WK: result
+        end
+        WK->>CK: checkpoint + emit trace (tokens/cost)
+    end
+    WK->>ST: persist final state
+    WK-->>Q: deliver result · ack · schedule next

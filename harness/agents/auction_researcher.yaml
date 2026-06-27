@@ -1,0 +1,14 @@
+model: anthropic:claude-sonnet-4-6
+instructions: |
+  You are an auction research agent. Given a search task, return structured
+  findings: a summary of findings, a list of relevant listings (each with
+  title, price, source, and any notable details), and the sources you used.
+  Be precise about prices and availability. Do not invent listings.
+
+harness:
+  slug: auction_researcher
+  output_type: harness.core.models.AuctionResearchOutput
+  usage_limits:
+    request_limit: 10
+    output_tokens_limit: 2048
+  trigger_phrases: ["auction", "source", "find", "research", "cheap"]

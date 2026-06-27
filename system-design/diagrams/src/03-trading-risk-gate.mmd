@@ -1,0 +1,22 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, system-ui, sans-serif','primaryColor':'#EDE7FF','primaryBorderColor':'#8B6FE8','primaryTextColor':'#2A2350','lineColor':'#8E7BD6','secondaryColor':'#E4DCFB','tertiaryColor':'#F5F1FF','clusterBkg':'#F6F2FF','clusterBorder':'#C9BCF2','titleColor':'#3A2F6B','actorBkg':'#E7DEFF','actorBorder':'#7C5CD6','actorTextColor':'#2A2350','actorLineColor':'#B6A6EC','signalColor':'#6E5AC2','signalTextColor':'#3A3160','labelBoxBkgColor':'#EDE7FF','labelBoxBorderColor':'#8B6FE8','labelTextColor':'#2A2350','loopTextColor':'#5A4BA0','noteBkgColor':'#FBF1DA','noteBorderColor':'#E3C98B','noteTextColor':'#4A3F2A','activationBkgColor':'#D9CCFA','activationBorderColor':'#9A82E0'},'flowchart':{'useMaxWidth':false,'htmlLabels':true,'curve':'basis'},'sequence':{'useMaxWidth':false}}}%%
+sequenceDiagram
+    participant SCH as Scheduler
+    participant W as Worker
+    participant AG as Trading Agent (fresh run)
+    participant RG as Risk Gate (deterministic envelope)
+    participant TH as Thread (admins)
+    participant EX as Exchange
+
+    SCH->>W: tick + inject state/checkpoint
+    W->>AG: run(market snapshot, positions, envelope)
+    AG->>AG: analyse → emit TYPED trade proposal
+    AG->>RG: propose(side, size, price, confidence, sources)
+    RG->>RG: check kill flag · caps · exposure · drawdown · rate · confidence · circuit breakers
+    alt outside envelope / breaker tripped / killed
+        RG-->>TH: blocked + reason — escalate card (admins) · no trade
+    else within envelope (and live, not dry-run)
+        RG->>EX: execute AUTONOMOUSLY (no human in the path)
+        EX-->>RG: fill
+        RG-->>TH: executed + provenance + audit (notify, don't ask)
+    end
+    W->>SCH: checkpoint + next_run

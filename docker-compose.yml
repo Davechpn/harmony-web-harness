@@ -1,0 +1,72 @@
+services:
+  harness-api:
+    build: .
+    command: uvicorn harness.api.app:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./harness:/app/harness
+
+  harness-workers:
+    build: .
+    command: python -m harness.execution.workers
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+
+  harness-scheduler:
+    build: .
+    command: python -m harness.execution.scheduler
+    env_file: .env
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  harness-sandbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.sandbox
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: harness
+      POSTGRES_USER: harness
+      POSTGRES_PASSWORD: harness
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U harness"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:

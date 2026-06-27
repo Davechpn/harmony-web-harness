@@ -1,0 +1,37 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, system-ui, sans-serif','primaryColor':'#EDE7FF','primaryBorderColor':'#8B6FE8','primaryTextColor':'#2A2350','lineColor':'#8E7BD6','secondaryColor':'#E4DCFB','tertiaryColor':'#F5F1FF','clusterBkg':'#F6F2FF','clusterBorder':'#C9BCF2','titleColor':'#3A2F6B','actorBkg':'#E7DEFF','actorBorder':'#7C5CD6','actorTextColor':'#2A2350','actorLineColor':'#B6A6EC','signalColor':'#6E5AC2','signalTextColor':'#3A3160','labelBoxBkgColor':'#EDE7FF','labelBoxBorderColor':'#8B6FE8','labelTextColor':'#2A2350','loopTextColor':'#5A4BA0','noteBkgColor':'#FBF1DA','noteBorderColor':'#E3C98B','noteTextColor':'#4A3F2A','activationBkgColor':'#D9CCFA','activationBorderColor':'#9A82E0'},'flowchart':{'useMaxWidth':false,'htmlLabels':true,'curve':'basis'},'sequence':{'useMaxWidth':false}}}%%
+flowchart TB
+    subgraph PO["Platform-owner plane (god mode)"]
+        ADM["Platform console"]
+    end
+    subgraph TN["Tenant plane (scoped to one tenant)"]
+        TC["Tenant console"]
+    end
+    API["Control-plane API<br/>RBAC · scope = platform | tenant<br/>every call audit-logged"]
+    subgraph Targets["What the API drives"]
+        TMP["Agent templates + capabilities"]
+        SKL["Skills registry (SKILL.md upload/attach)"]
+        MOD["Model allow-list + routing"]
+        POLc["Policy · HITL toggles · budgets · residency/retention"]
+        RUN["Runs (list · inspect · KILL)"]
+        TENp["Tenant provisioning"]
+        USG["Usage / metering (read)"]
+    end
+    ADM --> API
+    TC --> API
+    API --> TMP
+    API --> SKL
+    API --> MOD
+    API --> POLc
+    API --> RUN
+    API --> TENp
+    API --> USG
+    ADM -. full control .-> Targets
+    TC -. own tenant only .-> Targets
+style PO fill:#EAE1FF,stroke:#8E6FE6
+style TN fill:#E2E6FF,stroke:#6F84E6
+style Targets fill:#F6F2FF,stroke:#C9BCF2
+style API fill:#DCCFFA,stroke:#7C5CD6,color:#2A2350
+style ADM fill:#E7DCFF,stroke:#7C5CD6
+style TC fill:#E3E8FF,stroke:#6F84E6
+style POLc fill:#FBF1DA,stroke:#DDB466,color:#5A4A1E
+style RUN fill:#FCE6E8,stroke:#DC6E76,color:#7A2E33

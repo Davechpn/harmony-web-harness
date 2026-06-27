@@ -1,0 +1,102 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, system-ui, sans-serif','primaryColor':'#EDE7FF','primaryBorderColor':'#8B6FE8','primaryTextColor':'#2A2350','lineColor':'#8E7BD6','secondaryColor':'#E4DCFB','tertiaryColor':'#F5F1FF','clusterBkg':'#F6F2FF','clusterBorder':'#C9BCF2','titleColor':'#3A2F6B','actorBkg':'#E7DEFF','actorBorder':'#7C5CD6','actorTextColor':'#2A2350','actorLineColor':'#B6A6EC','signalColor':'#6E5AC2','signalTextColor':'#3A3160','labelBoxBkgColor':'#EDE7FF','labelBoxBorderColor':'#8B6FE8','labelTextColor':'#2A2350','loopTextColor':'#5A4BA0','noteBkgColor':'#FBF1DA','noteBorderColor':'#E3C98B','noteTextColor':'#4A3F2A','activationBkgColor':'#D9CCFA','activationBorderColor':'#9A82E0'},'flowchart':{'useMaxWidth':false,'htmlLabels':true,'curve':'basis'},'sequence':{'useMaxWidth':false}}}%%
+flowchart TB
+    subgraph App["YOUR CHAT APP — tenant authority (already built)"]
+        NEST["NestJS · owns tenants, white-label, users, threads, billing"]
+    end
+
+    subgraph Channels["Channel Layer (adapters)"]
+        CA["Custom App adapter"]
+        TG["Telegram adapter"]
+        WA["WhatsApp adapter"]
+        GM["Gmail / email adapter"]
+        SL["Slack adapter"]
+    end
+
+    GW["Gateway / Normaliser<br/>InboundMessage (carries tenant_id + locale)<br/>dedupe · edge rate-limit · injection screen"]
+
+    subgraph Thread["Thread Runtime"]
+        FC["Floor control (who speaks)"]
+        RT["Router / dispatcher"]
+        HO["Handover protocol (transparent)"]
+        ML["Language detect + reply locale"]
+    end
+
+    subgraph Harness["Agent Harness (Pydantic AI V2)"]
+        AR["Agent registry (declarative configs)"]
+        CAP["Capabilities (tools+hooks+instr+model)"]
+        MR["Model router (switch / fallback)"]
+        SK["Skills loader (SKILL.md)"]
+        UL["Usage limits (loops · tokens · tool calls)"]
+        HITL["HITL gates — TOGGLEABLE"]
+        PROV["Provenance / citations"]
+    end
+
+    subgraph Exec["Execution & Long-Running Runtime"]
+        Q["Task queue / workers"]
+        DUR["Durable runs + checkpoints"]
+        SCH["Scheduler / cron (anti-recursion + quiet hours)"]
+        SBX["Sandbox (isolated code exec)"]
+    end
+
+    subgraph Tools["Tools & Integrations"]
+        MCP["MCP connectors (Gmail · WhatsApp · web · browser)"]
+        VAULT["Per-tenant credential vault"]
+    end
+
+    subgraph State["State & Memory (tenant-scoped)"]
+        HIST["Thread history"]
+        MEM["Procedural memory / learned skills"]
+        RAG["Knowledge (vector)"]
+        CKPT["Checkpoint store"]
+    end
+
+    subgraph Gov["Governance, Evals & Observability"]
+        POL["Per-tenant policy engine<br/>guardrails · HITL toggle · budgets & hard caps"]
+        RES["Residency + retention controls"]
+        OTEL["Tracing / Logfire"]
+        EVAL["Evals (accuracy regression)"]
+        METER["Usage metering"]
+        AUDIT["Audit log (high-stakes actions)"]
+    end
+
+    subgraph CP["Control Plane (§4.9)"]
+        API["Control-plane API (RBAC)"]
+        ADM["Platform-owner console"]
+        TEN["Tenant console"]
+        KILL["Kill switch (run/agent/tenant/global)"]
+    end
+
+    NEST -->|tenant ctx + white-label config| CA
+    Channels --> GW --> Thread --> Harness
+    POL -. enforces .-> Harness
+    POL -. enforces .-> Tools
+    Harness <--> Tools
+    Harness <--> State
+    Harness --> Exec
+    Exec --> Harness
+    HITL -->|approval card| NEST
+    NEST -->|approve / deny| GW
+    Harness --> Gov
+    Thread --> Gov
+    State --> RES
+    Tools --> VAULT
+    METER -->|usage feed| NEST
+    ADM --> API
+    TEN --> API
+    API -->|create agents · add skills · set policy| Harness
+    API --> POL
+    API --> KILL
+    KILL -. halts .-> Exec
+style App fill:#E2E6FF,stroke:#6F84E6
+style Channels fill:#EFE9FF,stroke:#9B86EC
+style Thread fill:#EAE1FF,stroke:#8E6FE6
+style Harness fill:#E7DCFF,stroke:#7C5CD6
+style Exec fill:#E3E8FF,stroke:#6F84E6
+style Tools fill:#F1E2FB,stroke:#B36FD0
+style State fill:#FBE7F6,stroke:#CE6FB6
+style Gov fill:#FBF1DA,stroke:#DDB466
+style CP fill:#ECE6FF,stroke:#8B6FE8
+style NEST fill:#DCE2FF,stroke:#6F84E6,color:#23306B
+style HITL fill:#FBF0DA,stroke:#DDB466,color:#5A4A1E
+style KILL fill:#FCE6E8,stroke:#DC6E76,color:#7A2E33
+style GW fill:#EDE7FF,stroke:#8B6FE8

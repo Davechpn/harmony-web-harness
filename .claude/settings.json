@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:pydantic.dev)",
+      "Bash(claude --version)",
+      "Bash(claude plugin *)",
+      "Read(//Users/davidchipundo/.claude/plugins/cache/claude-plugins-official/pydantic-ai/0.1.0/skills/building-pydantic-ai-agents/references/**)",
+      "Bash(pip install *)",
+      "Bash(uv pip *)",
+      "Bash(python3 -m pip install uv -q)",
+      "Bash(uv venv *)",
+      "Bash(uv run *)"
+    ]
+  }
+}

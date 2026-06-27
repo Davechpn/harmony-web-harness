@@ -1,0 +1,13 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, system-ui, sans-serif','primaryColor':'#EDE7FF','primaryBorderColor':'#8B6FE8','primaryTextColor':'#2A2350','lineColor':'#8E7BD6','secondaryColor':'#E4DCFB','tertiaryColor':'#F5F1FF','clusterBkg':'#F6F2FF','clusterBorder':'#C9BCF2','titleColor':'#3A2F6B','actorBkg':'#E7DEFF','actorBorder':'#7C5CD6','actorTextColor':'#2A2350','actorLineColor':'#B6A6EC','signalColor':'#6E5AC2','signalTextColor':'#3A3160','labelBoxBkgColor':'#EDE7FF','labelBoxBorderColor':'#8B6FE8','labelTextColor':'#2A2350','loopTextColor':'#5A4BA0','noteBkgColor':'#FBF1DA','noteBorderColor':'#E3C98B','noteTextColor':'#4A3F2A','activationBkgColor':'#D9CCFA','activationBorderColor':'#9A82E0'},'flowchart':{'useMaxWidth':false,'htmlLabels':true,'curve':'basis'},'sequence':{'useMaxWidth':false}}}%%
+sequenceDiagram
+    participant H as Human(s)
+    participant A as @EventPlanner
+    participant TR as Thread Runtime
+    participant B as @AuctionResearcher
+
+    H->>A: "Find a venue, budget R20k, and source 50 chairs cheap"
+    A->>A: handles venue
+    A->>TR: request_handover(to=B, reason, context_summary, artifacts)
+    TR-->>H: 🔄 "@EventPlanner handed sourcing to @AuctionResearcher<br/>— context: 50 chairs, budget R4k, deadline Fri"
+    TR->>B: grant floor + handover packet
+    B->>H: "On it — searching local auctions for 50 chairs under R4k…"

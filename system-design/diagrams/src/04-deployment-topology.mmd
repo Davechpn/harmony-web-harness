@@ -1,0 +1,34 @@
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, system-ui, sans-serif','primaryColor':'#EDE7FF','primaryBorderColor':'#8B6FE8','primaryTextColor':'#2A2350','lineColor':'#8E7BD6','secondaryColor':'#E4DCFB','tertiaryColor':'#F5F1FF','clusterBkg':'#F6F2FF','clusterBorder':'#C9BCF2','titleColor':'#3A2F6B','actorBkg':'#E7DEFF','actorBorder':'#7C5CD6','actorTextColor':'#2A2350','actorLineColor':'#B6A6EC','signalColor':'#6E5AC2','signalTextColor':'#3A3160','labelBoxBkgColor':'#EDE7FF','labelBoxBorderColor':'#8B6FE8','labelTextColor':'#2A2350','loopTextColor':'#5A4BA0','noteBkgColor':'#FBF1DA','noteBorderColor':'#E3C98B','noteTextColor':'#4A3F2A','activationBkgColor':'#D9CCFA','activationBorderColor':'#9A82E0'},'flowchart':{'useMaxWidth':false,'htmlLabels':true,'curve':'basis'},'sequence':{'useMaxWidth':false}}}%%
+flowchart LR
+    subgraph VPS["VPS / Docker host"]
+        API["harness-api<br/>(gateway + webhooks + ws<br/>+ control-plane API/RBAC)"]
+        WRK["harness-workers<br/>(agent runs, scaled N · checks kill flag)"]
+        SCHd["scheduler"]
+        SBXd["sandbox runner<br/>(isolated)"]
+        REDIS["Redis<br/>(queue · rate limits · floor locks · kill flags)"]
+        PG["Postgres<br/>(runs, thread state, policy,<br/>audit, checkpoints — tenant-scoped)"]
+        VEC["Vector store<br/>(per-tenant RAG)"]
+    end
+    NEST["Your NestJS app<br/>(tenant authority + billing)"] <-->|webhook + ws · tenant ctx · approvals · usage feed| API
+    ADM["Platform-owner console"] --> API
+    TENc["Tenant console"] --> API
+    TGc["Telegram"] --> API
+    WAc["WhatsApp"] --> API
+    LLM["LLM providers<br/>(via model gateway)"]
+    WRK --> LLM
+    API --> REDIS
+    WRK --> REDIS
+    SCHd --> REDIS
+    WRK --> PG
+    WRK --> VEC
+    WRK --> SBXd
+style VPS fill:#F6F2FF,stroke:#C9BCF2
+style NEST fill:#DCE2FF,stroke:#6F84E6,color:#23306B
+style ADM fill:#EAE1FF,stroke:#8E6FE6
+style TENc fill:#EAE1FF,stroke:#8E6FE6
+style API fill:#DCCFFA,stroke:#7C5CD6,color:#2A2350
+style REDIS fill:#FCE6E8,stroke:#DC6E76,color:#7A2E33
+style PG fill:#E2E6FF,stroke:#6F84E6
+style VEC fill:#F1E2FB,stroke:#B36FD0
+style LLM fill:#FBF1DA,stroke:#DDB466,color:#5A4A1E
+style WRK fill:#E7DCFF,stroke:#7C5CD6

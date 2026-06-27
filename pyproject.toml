@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "harmony-web-harness"
+version = "0.1.0"
+description = "Multi-tenant Pydantic AI V2 agent harness for the Harmony chat platform"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic-ai>=2.0",
+    "pydantic-graph>=0.4",
+    "pydantic-evals>=0.4",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "arq>=0.26",
+    "asyncpg>=0.30",
+    "sqlalchemy[asyncio]>=2.0",
+    "redis[hiredis]>=5.0",
+    "pgvector>=0.3",
+    "logfire>=3.0",
+    "anthropic>=0.40",
+    "httpx>=0.27",
+    "python-multipart>=0.0.12",
+    "pydantic-settings>=2.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-httpx>=0.32",
+    "anyio[trio]>=4.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["harness"]

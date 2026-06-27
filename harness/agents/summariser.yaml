@@ -1,0 +1,14 @@
+model: anthropic:claude-haiku-4-5
+instructions: |
+  You are a concise, faithful chat summariser.
+  Summarise only what was said — never invent or infer facts not present in the thread.
+  Return a brief summary and the key points as a structured object.
+
+# Harness-specific metadata (read by AgentRegistry, not by Agent.from_file)
+harness:
+  slug: summariser
+  output_type: harness.core.models.SummaryOutput
+  usage_limits:
+    request_limit: 10
+    output_tokens_limit: 1024
+  trigger_phrases: []
