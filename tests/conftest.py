@@ -5,4 +5,5 @@ import os
 # are made.
 os.environ.setdefault("ANTHROPIC_API_KEY", "sk-ant-test-key")
 os.environ.setdefault("OPENAI_API_KEY", "sk-test-key")
+os.environ.setdefault("OPENROUTER_API_KEY", "sk-or-v1-test-key")
 os.environ.setdefault("LOGFIRE_IGNORE_NO_CONFIG", "1")

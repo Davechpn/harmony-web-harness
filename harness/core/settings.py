@@ -1,4 +1,10 @@
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# pydantic-settings parses .env into this model's fields but does not export
+# it to os.environ, while pydantic-ai's model providers read API keys
+# directly via os.getenv(). Load .env into the process env so both agree.
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -6,6 +12,8 @@ class Settings(BaseSettings):
 
     anthropic_api_key: str = ""
     openai_api_key: str = ""
+    gemini_api_key: str = ""
+    openrouter_api_key: str = ""
 
     database_url: str = "postgresql+asyncpg://harness:harness@localhost:5432/harness"
     redis_url: str = "redis://localhost:6379"

@@ -4,10 +4,11 @@ import json
 
 from pydantic_ai import ModelRequest
 from pydantic_ai.direct import model_request
+from pydantic_ai.messages import TextPart
 
 from harness.core.registry import AgentRegistry
 
-_ROUTER_MODEL = "anthropic:claude-haiku-4-5"
+_ROUTER_MODEL = "openrouter:qwen/qwen3.5-9b"
 
 _SYSTEM_PROMPT = """\
 You are a lightweight message router for a multi-agent chat system.
@@ -43,15 +44,12 @@ async def classify(
 
     response = await model_request(
         _ROUTER_MODEL,
-        [
-            ModelRequest.system_text_prompt(_SYSTEM_PROMPT),
-            ModelRequest.user_text_prompt(user_text),
-        ],
+        [ModelRequest.user_text_prompt(user_text, instructions=_SYSTEM_PROMPT)],
     )
 
     raw_text = ""
     for part in response.parts:
-        if hasattr(part, "content"):
+        if isinstance(part, TextPart):
             raw_text += part.content
 
     try:

@@ -1,0 +1,60 @@
+{
+  "info": {
+    "name": "Harmony Web Harness",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:8420" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Inbound App - Summariser",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/inbound/app",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tenantId\": \"tenant-demo\",\n  \"channel\": \"app\",\n  \"threadId\": \"thread-1\",\n  \"messageId\": \"msg-1\",\n  \"senderType\": \"user\",\n  \"senderId\": \"user-1\",\n  \"text\": \"Can you summarise: Alice said the launch is Friday. Bob said marketing assets are ready.\",\n  \"timestamp\": 1751300000\n}"
+        }
+      }
+    },
+    {
+      "name": "Inbound App - Event Planner",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/inbound/app",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tenantId\": \"tenant-demo\",\n  \"channel\": \"app\",\n  \"threadId\": \"thread-2\",\n  \"messageId\": \"msg-2\",\n  \"senderType\": \"user\",\n  \"senderId\": \"user-1\",\n  \"text\": \"Help me plan a launch event next month\",\n  \"timestamp\": 1751300000\n}"
+        }
+      }
+    },
+    {
+      "name": "Inbound App - Auction Researcher",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/inbound/app",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tenantId\": \"tenant-demo\",\n  \"channel\": \"app\",\n  \"threadId\": \"thread-3\",\n  \"messageId\": \"msg-3\",\n  \"senderType\": \"user\",\n  \"senderId\": \"user-1\",\n  \"text\": \"Can you research cheap auction listings for folding chairs\",\n  \"timestamp\": 1751300000\n}"
+        }
+      }
+    }
+  ]
+}
